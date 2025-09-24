@@ -3,7 +3,7 @@ let weeksData = [];
 let statusesData = [];
 let historyData = {};
 
-const API_BASE = "https://<your-invoke-url-from-terraform>";
+const API_BASE = "https://rd50zt3e10.execute-api.us-east-1.amazonaws.com";
 
 async function authenticate() {
   const input = document.getElementById("nameInput").value.trim().toLowerCase();
