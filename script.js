@@ -3,6 +3,53 @@ let weeksData = [];
 let statusesData = [];
 let historyData = {};
 
+const API_BASE = "https://<your-invoke-url-from-terraform>";
+
+async function authenticate() {
+  const input = document.getElementById("nameInput").value.trim().toLowerCase();
+  const errorEl = document.getElementById("error");
+
+  try {
+    const response = await fetch("input/names.json");
+    const names = await response.json();
+
+    // check against full name OR first name (case-insensitive)
+    const match = names.find(person => {
+      const fullName = person.name.toLowerCase();
+      const firstName = person.name.split(" ")[0].toLowerCase();
+      return fullName === input || firstName === input;
+    });
+
+    if (match) {
+      // hide login, show main content
+      document.getElementById("auth-container").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+
+      // save in session storage (clears when tab/browser closes)
+      sessionStorage.setItem("authenticatedUser", match.name);
+    } else {
+      errorEl.style.display = "block";
+    }
+  } catch (err) {
+    console.error("Error loading names.json:", err);
+  }
+}
+
+// auto-login if already authenticated in this session
+function autoLogin() {
+  const savedUser = sessionStorage.getItem("authenticatedUser");
+  if (savedUser) {
+    document.getElementById("auth-container").style.display = "none";
+    document.getElementById("main-content").style.display = "block";
+  }
+}
+
+// bind login button click
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loginBtn").addEventListener("click", authenticate);
+  autoLogin();
+});
+
 function createDropdown(options, selectedValue = "") {
   const select = document.createElement("select");
   options.forEach(opt => {
@@ -82,7 +129,8 @@ async function loadData() {
   const namesRes = await fetch("/input/names.json");
   const weeksRes = await fetch("/input/selection.json");
   const statusRes = await fetch("/input/status.json");
-  const historyRes = await fetch("/output/history.json");
+  //const historyRes = await fetch(`${API_BASE}/history`);
+  const historyRes = await fetch("output/history.json");
 
   namesData = await namesRes.json();
   weeksData = await weeksRes.json();
@@ -129,7 +177,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
     historyData[empId][week] = days;
   });
 
-  const response = await fetch("/save-history", {
+  const response = await fetch(`${API_BASE}/save-history`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(historyData, null, 2)
