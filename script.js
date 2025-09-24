@@ -10,7 +10,7 @@ async function authenticate() {
   const errorEl = document.getElementById("error");
 
   try {
-    const response = await fetch("input/names.json");
+    const response = await fetch("./input/names.json");
     const names = await response.json();
 
     // check against full name OR first name (case-insensitive)
@@ -126,9 +126,9 @@ function renderTable() {
 }
 
 async function loadData() {
-  const namesRes = await fetch("/input/names.json");
-  const weeksRes = await fetch("/input/selection.json");
-  const statusRes = await fetch("/input/status.json");
+  const namesRes = await fetch("./input/names.json");
+  const weeksRes = await fetch("./input/selection.json");
+  const statusRes = await fetch("./input/status.json");
   //const historyRes = await fetch(`${API_BASE}/history`);
   const historyRes = await fetch("output/history.json");
 
